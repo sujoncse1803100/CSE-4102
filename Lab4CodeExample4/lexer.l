@@ -1,0 +1,61 @@
+%option noyywrap
+
+%{
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include "parser.tab.h"
+	
+	int lineno = 1; // initialize to 1
+	void yyerror();
+%}
+
+alpha     [a-zA-Z]
+digit     [0-9]
+alnum     {alpha}|{digit}
+print     [ -~]
+
+ID        {alpha}{alnum}*
+ICONST    [0-9]{digit}*
+FCONST    {digit}*"."{digit}+
+CCONST    (\'{print}\')
+%%
+
+"//".*        { } 
+
+"dim"       { printf("%s -- > DIM \n ",yytext); return DIM; }
+
+"as"       { printf("%s -- > As \n ",yytext); return AS; }
+"integer"       { printf("%s -- > Integer \n ",yytext); return INT; }
+"double"    { return DOUBLE; }
+"char"		{ return CHAR; }
+
+"if"		{return IF;}
+"else"		{return ELSE;}
+
+"+"       { return ADDOP; }
+"-"       { return SUBOP; }
+"*"       { return MULOP; }
+"/"       { return DIVOP; }
+"=="      { return EQUOP; }
+">"       { return GT; }
+"<"       { return LT; }
+
+"("       { return LPAREN; }
+")"       { return RPAREN; }
+"{"       { return LBRACE; }
+"}"       { return RBRACE; }
+";"       {printf("%s -- > Semicolon \n ",yytext); return SEMI; }
+"="       { return ASSIGN; }
+
+
+
+{ID}        {printf("%s -- > Id \n ",yytext); return ID;}
+{ICONST}    {return ICONST;}
+{FCONST}    {return FCONST;}
+{CCONST}    {return CCONST;}
+
+"\n"        { lineno += 1; }
+[ \t\r\f]+  
+
+.       { yyerror("Unrecognized character"); }
